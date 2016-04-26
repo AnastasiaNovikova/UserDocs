@@ -1,0 +1,179 @@
+{# TEMPLATE VAR SETTINGS #}
+{%- set url_root = pathto('', 1) %}
+{%- if url_root == '#' %}{% set url_root = '' %}{% endif %}
+{%- if not embedded and docstitle %}
+  {%- set titlesuffix = " &mdash; "|safe + docstitle|e %}
+{%- else %}
+  {%- set titlesuffix = "" %}
+{%- endif %}
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  {{ metatags }}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% block htmltitle %}
+  <title>{{ title|striptags|e }}{{ titlesuffix }}</title>
+  {% endblock %}
+
+  {# FAVICON #}
+  {% if favicon %}
+    <link rel="shortcut icon" href="{{ pathto('_static/' + favicon, 1) }}"/>
+  {% endif %}
+
+  {# OPENSEARCH #}
+  {% if not embedded %}
+    {% if use_opensearch %}
+      <link rel="search" type="application/opensearchdescription+xml" title="{% trans docstitle=docstitle|e %}Search within {{ docstitle }}{% endtrans %}" href="{{ pathto('_static/opensearch.xml', 1) }}"/>
+    {% endif %}
+
+  {% endif %}
+  {%- block linktags %}
+    {%- if hasdoc('about') %}
+        <link rel="author" title="{{ _('About these documents') }}"
+              href="{{ pathto('about') }}"/>
+    {%- endif %}
+    {%- if hasdoc('genindex') %}
+        <link rel="index" title="{{ _('Index') }}"
+              href="{{ pathto('genindex') }}"/>
+    {%- endif %}
+    {%- if hasdoc('search') %}
+        <link rel="search" title="{{ _('Search') }}" href="{{ pathto('search') }}"/>
+    {%- endif %}
+    {%- if hasdoc('copyright') %}
+        <link rel="copyright" title="{{ _('Copyright') }}" href="{{ pathto('copyright') }}"/>
+    {%- endif %}
+    <link rel="top" title="{{ docstitle|e }}" href="{{ pathto('index') }}"/>
+    {%- if parents %}
+        <link rel="up" title="{{ parents[-1].title|striptags|e }}" href="{{ parents[-1].link|e }}"/>
+    {%- endif %}
+    {%- if next %}
+        <link rel="next" title="{{ next.title|striptags|e }}" href="{{ next.link|e }}"/>
+    {%- endif %}
+    {%- if prev %}
+        <link rel="prev" title="{{ prev.title|striptags|e }}" href="{{ prev.link|e }}"/>
+    {%- endif %}
+  {%- endblock %}
+  {%- block extrahead %} {% endblock %}
+
+	<link rel="stylesheet" href="{{ pathto('_static/css/main.css', 1) }}" type="text/css" />
+	<!--<link rel="stylesheet" href="{{ pathto('_static/css/theme.css', 1) }}" type="text/css" />-->
+
+	{# Keep modernizr in head - http://modernizr.com/docs/#installing #}
+	<script src="{{ pathto('_static/js/modernizr.min.js', 1) }}"></script>
+	<script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'{{ url_root }}',
+            VERSION:'{{ release|e }}',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'{{ '' if no_search_suffix else file_suffix }}',
+            HAS_SOURCE:  {{ has_source|lower }}
+        };
+    </script>
+	{%- for scriptfile in script_files %}
+      <script type="text/javascript" src="{{ pathto(scriptfile, 1) }}"></script>
+    {%- endfor %}
+</head>
+
+<body role="document">
+	<div class="header fx-origin _header">
+		<div class="header-top">
+			<div class="padding">
+				<div class="wrap">
+					<div class="social">
+						<a href="https://www.facebook.com/cityadsmedia" class="icon icon-social-fb" target="_blank"></a>
+						<a href="https://twitter.com/cityads_ru" class="icon icon-social-tw" target="_blank"></a>
+						<a href="http://vk.com/cityads" class="icon icon-social-vk" target="_blank"></a>
+					</div>
+					<a href="http://cityads.com/ru/company/contacts" class="lnk">Контакты</a>
+
+					<div class="fr">
+						{% include "searchbox.html" %}
+						<!--
+						<input type="text" class="search _search_input" placeholder="Поиск">
+						 SERCHFORM -->
+						<!--
+							<form method="get" id="searchForm" action="/api/dev/search">
+								<input type="hidden" name="q" value="<?= htmlspecialchars($_REQUEST['q']) ?>">
+								<input type="hidden" name="start" value="0">
+								<input type="hidden" name="limit" value="20">
+								<input type="hidden" name="lang" value="<?= $lang ?>">
+							</form>
+
+						<div class="switch">
+							<span class="s-lang _lang-switch"><?= $lang ?></span>
+							<ul class="s-lang-list _lang-list">
+								<li>
+									<a href="#!" class="slct" data-lang="ru">RU (Русский)</a>
+									<a href="#!" class="slct" data-lang="en">US (US English)</a>
+									<a href="#!" class="slct" data-lang="br">BR (Brasil Português)</a>
+								</li>
+							</ul>
+						</div>-->
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="header-bottom">
+      <a href="javascript:void(0);" class="logo">cityads</a>
+      <div class="head">{{ project }}</div>
+		</div>
+	</div>
+
+	<!--
+	<div class="menu-bar fx-origin">
+		<div class="padding">
+			<div class="wrap">
+				<div class="bar">
+					<div class="item"><a href="javascript:void(0);" class="icon icon-home"></a></div>
+					<div class="item"><a href="javascript:void(0);" class="icon icon-part slct"></a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	-->
+	<div class="menu-panel fx-origin">
+    <div class="menu wy-side-scroll">
+        {% block menu %}
+          {% set toctree = toctree(maxdepth=4, collapse=theme_collapse_navigation, includehidden=True) %}
+          {% if toctree %}
+            {{ toctree }}
+          {% else %}>
+            <div class="local-toc">{{ toc }}</div>
+          {% endif %}
+        {% endblock %}
+    </div>
+	</div>
+	<div class="page">
+		<div class="padding">
+			<div class="wrap">
+				{% include "breadcrumbs.html" %}
+        <div class="rst-content">
+				  {% block body %}{% endblock %}
+				  {% include "footer.html" %}
+        </div>
+			</div>
+		</div>
+	</div>
+	{% block footer %}{% endblock %}
+  <script type="text/javascript">
+      jQuery(function () {
+        SphinxRtdTheme.StickyNav.enable();
+        function hashChange(){
+		var hash = document.location.hash;
+		$('.menu .current a').each(function(index, item){
+		    var href = item.getAttribute('href');
+		    if(href){
+		      $(item).toggleClass('current', href == hash);
+		    }
+		});
+	}
+        window.addEventListener("hashchange", hashChange);
+        hashChange();
+      });
+  </script>
+</body>
+</html>
